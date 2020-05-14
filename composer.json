@@ -1,0 +1,30 @@
+{
+    "name": "cdev/x-payments-cloud",
+    "description": "X-Payments connector. This extension integrates Magento 2 with X-Payments - a PA-DSS certified payment module.",
+    "type": "magento2-module",
+    "version": "100.3.0-rc",
+    "license": [
+        "OSL-3.0",
+        "AFL-3.0"
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "php": "~7.1.3||~7.3.0",
+        "magento/module-payment": "100.3.*",
+        "magento/module-checkout": "100.3.*",
+        "magento/module-sales": "102.0.*",
+        "xpayments/cloud-sdk-php": ">=0.2.0"
+    },
+    "autoload": {
+        "files": [ "registration.php" ],
+        "psr-4": {
+            "CDev\\XPaymentsCloud\\": ""
+        }
+    },
+    "repositories": [
+        {
+            "type": "git",
+            "url": "https://github.com/xpayments/m2-cloud"
+        }
+    ]
+}
