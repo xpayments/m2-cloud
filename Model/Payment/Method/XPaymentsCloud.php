@@ -57,6 +57,8 @@ class XPaymentsCloud extends \Magento\Payment\Model\Method\AbstractMethod
     protected $_canRefund               = true;
     protected $_canRefundInvoicePartial = true;
 
+    protected $_canVoid                 = true;
+
     protected $_canReviewPayment        = true;    
 
     /**
@@ -100,13 +102,6 @@ class XPaymentsCloud extends \Magento\Payment\Model\Method\AbstractMethod
      * @var \CDev\XPaymentsCloud\Logger\Logger
      */
     protected $xpaymentsLogger = null;
-
-    /**
-     * Action code (authorize, capture, etc)
-     *
-     * @var string
-     */
-    protected $actionCode = null;
 
     /**
      * Constructor
@@ -308,8 +303,6 @@ class XPaymentsCloud extends \Magento\Payment\Model\Method\AbstractMethod
                     $this->composeUrl('callback')
                 );
 
-            $this->actionCode = 'authorize';
-
             $this->processResponse($response, $payment);
 
         } catch (\Exception $exception) {
@@ -342,8 +335,6 @@ class XPaymentsCloud extends \Magento\Payment\Model\Method\AbstractMethod
                     $this->getParentXpid($payment),
                     $amount
                 );
-
-            $this->actionCode = 'capture';
 
             $this->processResponse($response, $payment);
 
@@ -378,8 +369,6 @@ class XPaymentsCloud extends \Magento\Payment\Model\Method\AbstractMethod
                     $amount
                 );
 
-            $this->actionCode = 'refund';
-
             $this->processResponse($response, $payment);
 
         } catch (\Exception $exception) {
@@ -408,8 +397,6 @@ class XPaymentsCloud extends \Magento\Payment\Model\Method\AbstractMethod
             $response = $this->clientHelper
                 ->getClient()
                 ->doVoid($this->getParentXpid($payment));
-
-            $this->actionCode = 'void';
 
             $this->processResponse($response, $payment);
 
@@ -514,7 +501,7 @@ class XPaymentsCloud extends \Magento\Payment\Model\Method\AbstractMethod
         $info = $response->getPayment();
 
         // Compose transaction ID preventing duplicates
-        $transactionId = sprintf('%s-%s', $info->xpid, $this->actionCode);
+        $transactionId = sprintf('%s-%s', $info->xpid, $info->lastTransaction->action);
 
         // Set some basic information about the payment
         $payment->setStatus(self::STATUS_APPROVED)
@@ -546,7 +533,7 @@ class XPaymentsCloud extends \Magento\Payment\Model\Method\AbstractMethod
             );
         }
 
-        // Mark or unmark as fraud
+        // Set fraudulent flag
         $payment->setIsTransactionPending(
             (bool)$info->isFraudulent
         );

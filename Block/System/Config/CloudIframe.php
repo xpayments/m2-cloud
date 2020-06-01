@@ -80,7 +80,7 @@ class CloudIframe extends \Magento\Config\Block\System\Config\Form\Field
         \Magento\Framework\Data\Form\Element\AbstractElement $element,
         $html
     ) {
-        $html = sprintf('<td colspan=3>%s</td>', $html);
+        $html = sprintf('<td colspan="3">%s</td>', $html);
 
         return parent::_decorateRowHtml($element, $html);
     }

@@ -42,6 +42,13 @@ class Widget extends \Magento\Backend\Block\Template
     protected $request = null;
 
     /**
+     * Store Manager
+     *
+     * @var \Magento\Store\Model\StoreManagerInterface
+     */
+    protected $storeManager = null;
+
+    /**
      * Backend URL builder
      *
      * @var \Magento\Backend\Model\UrlInterface
@@ -54,6 +61,7 @@ class Widget extends \Magento\Backend\Block\Template
      * @param \Magento\Backend\Block\Template\Context $context
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      * @param \Magento\Framework\App\RequestInterface $request
+     * @param \Magento\Store\Model\StoreManagerInterface $storeManager
      * @param \Magento\Backend\Model\UrlInterface $backendUrl
      * @param array $data
      *
@@ -63,6 +71,7 @@ class Widget extends \Magento\Backend\Block\Template
         \Magento\Backend\Block\Template\Context $context,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Framework\App\RequestInterface $request,
+        \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Magento\Backend\Model\UrlInterface $backendUrl,
         array $data = array()
     ) {
@@ -70,6 +79,7 @@ class Widget extends \Magento\Backend\Block\Template
 
         $this->scopeConfig = $scopeConfig;
         $this->request = $request;
+        $this->storeManager = $storeManager;
         $this->backendUrl = $backendUrl;
 
         parent::__construct($context, $data);
@@ -85,6 +95,7 @@ class Widget extends \Magento\Backend\Block\Template
         return new \CDev\XPaymentsCloud\Transport\ConnectSettings(
             $this->scopeConfig,
             $this->request,
+            $this->storeManager,
             $this->backendUrl
         );
     }

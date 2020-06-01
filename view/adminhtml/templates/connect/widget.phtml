@@ -38,6 +38,16 @@ require([
 ], function () {
 
     /**
+     * Process hide/show event on config section
+     */
+    Fieldset.toggleCollapse = Fieldset.toggleCollapse.wrap(
+        function (parentMethod, containerId, saveThroughAjax) {
+            parentMethod(containerId, saveThroughAjax);
+            this.xpayments.load();
+        }
+    );
+
+    /**
      * Save configuration
      */
     XPaymentsConnect.prototype.saveConfig = function (params) {

@@ -21,7 +21,7 @@ function XPaymentsWidget()
         language: '',
         customerId: '',
         showSaveCard: true,
-        enableApplePay: true,
+        enableWallets: true,
         company: {
             name: '',
             domain: document.location.hostname,
@@ -217,8 +217,10 @@ XPaymentsWidget.prototype.submit = function()
 XPaymentsWidget.prototype._afterLoad = function(params)
 {
     this.showSaveCard();
-    if (this._isApplePayAvailable() && this.config.enableApplePay) {
-      this._sendEvent('applepay.enable');
+    if (this.config.enableWallets) {
+        if (this._isApplePayAvailable()) {
+            this._sendEvent('applepay.enable');
+        }
     }
     this.setOrder();
     this.resize(params.height);

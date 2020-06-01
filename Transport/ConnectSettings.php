@@ -35,6 +35,13 @@ class ConnectSettings extends DataObject
     protected $request = null;
 
     /**
+     * Store Manager
+     *
+     * @var \Magento\Store\Model\StoreManagerInterface
+     */
+    protected $storeManager = null;
+
+    /**
      * Backend URL builder
      *
      * @var \Magento\Backend\Model\UrlInterface
@@ -46,6 +53,7 @@ class ConnectSettings extends DataObject
      *
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      * @param \Magento\Framework\App\RequestInterface $request
+     * @param \Magento\Store\Model\StoreManagerInterface $storeManager
      * @param \Magento\Backend\Model\UrlInterface $backendUrl
      *
      * @return \Magento\Framework\DataObject 
@@ -53,9 +61,11 @@ class ConnectSettings extends DataObject
     public function __construct(
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Framework\App\RequestInterface $request,
+        \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Magento\Backend\Model\UrlInterface $backendUrl
     ) {
         $this->request = $request;
+        $this->storeManager = $storeManager;
         $this->backendUrl = $backendUrl;
 
         $data = array(
@@ -64,8 +74,9 @@ class ConnectSettings extends DataObject
             'devUrl'         => (string)$scopeConfig->getValue('payment/xpayments_cloud/dev_url'),
             'topElement'     => '',
             'container'      => '#xpayments-iframe-container',
-            'sectionId'      => 'payment_us_xpayments_cloud_connection',
+            'sectionId'      => 'payment_us_xpayments_cloud',
             'loaded'         => false,
+            'referrerUrl'    => $this->getReferrerUrl(),
             'saveUrl'        => $this->getSaveUrl(),
             'configMap'      => $this->getConfigMap(),
             'debug'          => (bool)$scopeConfig->getValue('payment/xpayments_cloud/debug'),
@@ -125,5 +136,22 @@ class ConnectSettings extends DataObject
         }
 
         return $this->backendUrl->getUrl('xpayments_cloud/system_config/save', $params);
+    }
+
+    /**
+     * Get referrer URL for X-Payments Connect
+     *
+     * @return string
+     */
+    protected function getReferrerUrl()
+    {
+        // Remove session key from URL
+        $url = preg_replace(
+            array('/\/key\/\w+\//', '/\?.*$/'),
+            array('/platform/magento2', ''),
+            $this->storeManager->getStore()->getCurrentUrl()
+        );
+
+        return $url;
     }
 }

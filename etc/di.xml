@@ -46,4 +46,7 @@
         </arguments>
     </type>
 
+    <!-- Auth/Sale/Capture logic -->
+    <preference for="Magento\Sales\Model\Order\Payment" type="CDev\XPaymentsCloud\Model\Order\Payment" />
+
 </config>
