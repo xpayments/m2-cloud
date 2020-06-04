@@ -1,8 +1,8 @@
 {
     "name": "cdev/x-payments-cloud",
-    "description": "X-Payments connector. This extension integrates Magento 2 with X-Payments - a PA-DSS certified payment module.",
+    "description": "PCI level 1 certified & PSD2/SCA ready all-in-one secure credit card processing solution for web shops X-Payments takes the PCI DSS burden off your shoulders.",
     "type": "magento2-module",
-    "version": "100.3.0-rc",
+    "version": "100.3.0",
     "license": [
         "OSL-3.0",
         "AFL-3.0"
@@ -13,7 +13,7 @@
         "magento/module-payment": "100.3.*",
         "magento/module-checkout": "100.3.*",
         "magento/module-sales": "102.0.*",
-        "xpayments/cloud-sdk-php": ">=0.2.0"
+        "xpayments/cloud-sdk-php": "~0.2.0"
     },
     "autoload": {
         "files": [ "registration.php" ],

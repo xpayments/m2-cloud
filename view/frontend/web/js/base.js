@@ -275,7 +275,9 @@ XPayments.prototype = {
 
         if (formElm) {
 
-            this.getTokenInput().setValue(params.token);
+            var inputElm = this.getTokenInput();
+
+            inputElm.value = params.token;
 
             if (this.settings.autoSubmit) {
                 formElm.submit();
