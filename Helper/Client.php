@@ -22,8 +22,6 @@
 
 namespace CDev\XPaymentsCloud\Helper;
 
-require_once(BP . '/vendor/xpayments/cloud-sdk-php/lib/XPaymentsCloud/Client.php');
-
 /**
  * Helper for X-Payments SDK Client 
  */
