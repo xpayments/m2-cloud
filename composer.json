@@ -2,7 +2,7 @@
     "name": "cdev/x-payments-cloud",
     "description": "PCI level 1 certified & PSD2/SCA ready all-in-one secure credit card processing solution for web shops X-Payments takes the PCI DSS burden off your shoulders.",
     "type": "magento2-module",
-    "version": "100.3.0",
+    "version": "100.3.1-rc",
     "license": [
         "OSL-3.0",
         "AFL-3.0"
@@ -10,10 +10,10 @@
     "minimum-stability": "dev",
     "require": {
         "php": "~7.1.3||~7.2.0||~7.3.0",
-        "magento/module-payment": "100.3.*",
-        "magento/module-checkout": "100.3.*",
-        "magento/module-sales": "102.0.*",
-        "xpayments/cloud-sdk-php": "~0.2.0"
+        "magento/module-payment": "100.4.*",
+        "magento/module-checkout": "100.4.*",
+        "magento/module-sales": "103.0.*",
+        "xpayments/cloud-sdk-php": "~0.2.*"
     },
     "autoload": {
         "files": [ "registration.php" ],
