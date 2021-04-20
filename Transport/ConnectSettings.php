@@ -42,11 +42,32 @@ class ConnectSettings extends DataObject
     protected $storeManager = null;
 
     /**
+     * Scope Config
+     *
+     * @var \Magento\Framework\App\Config\ScopeConfigInterface
+     */
+    protected $scopeConfig = null;
+
+    /**
      * Backend URL builder
      *
      * @var \Magento\Backend\Model\UrlInterface
      */
     protected $backendUrl = null;
+
+    /**
+     * PayPal Structure Plugin
+     *
+     * @var \Magento\Paypal\Model\Config\StructurePlugin
+     */
+    protected $paypalStructure = null;
+
+    /**
+     * Section ID
+     *
+     * @param string
+     */
+    protected $sectionId = null;
 
     /**
      * Constructor
@@ -62,11 +83,14 @@ class ConnectSettings extends DataObject
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Framework\App\RequestInterface $request,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
-        \Magento\Backend\Model\UrlInterface $backendUrl
+        \Magento\Backend\Model\UrlInterface $backendUrl,
+        \Magento\Paypal\Model\Config\StructurePlugin $paypalStructure
     ) {
         $this->request = $request;
         $this->storeManager = $storeManager;
         $this->backendUrl = $backendUrl;
+        $this->scopeConfig = $scopeConfig;
+        $this->paypalStructure = $paypalStructure;
 
         $data = array(
             'account'        => $scopeConfig->getValue('payment/xpayments_cloud/account'),
@@ -74,7 +98,7 @@ class ConnectSettings extends DataObject
             'devUrl'         => (string)$scopeConfig->getValue('payment/xpayments_cloud/dev_url'),
             'topElement'     => '',
             'container'      => '#xpayments-iframe-container',
-            'sectionId'      => 'payment_us_xpayments_cloud',
+            'sectionId'      => $this->getSectionId(),
             'loaded'         => false,
             'referrerUrl'    => $this->getReferrerUrl(),
             'saveUrl'        => $this->getSaveUrl(),
@@ -108,7 +132,7 @@ class ConnectSettings extends DataObject
         foreach ($fields as $field) {
 
             $map[] = array(
-                'field' => 'payment_us_xpayments_cloud_connection_' . $field,
+                'field' => $this->getSectionId() . '_connection_' . $field,
                 'param' => lcfirst($this->ucWords($field, '')),
             );
         }
@@ -153,5 +177,39 @@ class ConnectSettings extends DataObject
         );
 
         return $url;
+    }
+
+    /**
+     * Get ID of section
+     *
+     * @return string
+     */
+    protected function getSectionId()
+    {
+        if (null !== $this->sectionId) {
+            return $this->sectionId;
+        }
+
+        if ($this->request->getParam('paypal_country')) {
+            $merchantCountry = $this->request->getParam('paypal_country');
+        } elseif ($this->scopeConfig->getValue('paypal/general/merchant_country')) {
+            $merchantCountry = $this->scopeConfig->getValue('paypal/general/merchant_country');
+        } elseif ($this->scopeConfig->getValue('general/country/default')) {
+            $merchantCountry = $this->scopeConfig->getValue('general/country/default');
+        } else {
+            $merchantCountry = 'US';
+        }
+
+        $merchantCountry = 'payment_' . strtolower($merchantCountry);
+
+        $paypalCountries = $this->paypalStructure->getPaypalConfigCountries();
+
+        if (!in_array($merchantCountry, $paypalCountries)) {
+            $merchantCountry = 'payment_other';
+        }
+
+        $this->sectionId = $merchantCountry . '_xpayments_cloud';
+
+        return $this->sectionId;
     }
 }

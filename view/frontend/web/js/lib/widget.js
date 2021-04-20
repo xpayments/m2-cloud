@@ -2,7 +2,7 @@
  * X-Payments Cloud SDK - Payment Widget
  */
 
-function XPaymentsWidget()
+window.XPaymentsWidget = function()
 {
     this.serverDomain = 'xpayments.com';
     this.messageNamespace = 'xpayments.widget.';
@@ -20,8 +20,23 @@ function XPaymentsWidget()
         form: '',
         language: '',
         customerId: '',
+        tokenName: 'xpaymentsToken',
         showSaveCard: true,
         enableWallets: true,
+        applePay: {
+            enabled: true,
+            checkoutMode: false,
+            shippingMethods: [],
+            requiredShippingFields: [
+                'email',
+                'name',
+                'phone',
+                'postalAddress'
+            ],
+            requiredBillingFields: [
+                'postalAddress'
+            ]
+        },
         company: {
             name: '',
             domain: document.location.hostname,
@@ -41,11 +56,15 @@ function XPaymentsWidget()
 
 }
 
-XPaymentsWidget.prototype.on = function(event, handler)
+XPaymentsWidget.prototype.on = function(event, handler, context)
 {
+    if ('undefined' === typeof context) {
+        context = this;
+    }
+
     if ('formSubmit' !== event) {
 
-        this.handlers[event] = handler.bind(this);
+        this.handlers[event] = handler.bind(context);
 
     } else {
         var formElm = this.getFormElm();
@@ -54,7 +73,7 @@ XPaymentsWidget.prototype.on = function(event, handler)
             if (this.bindedSubmit) {
                 formElm.removeEventListener('submit', this.bindedSubmit);
             }
-            this.bindedSubmit = handler.bind(this);
+            this.bindedSubmit = handler.bind(context);
             formElm.addEventListener('submit', this.bindedSubmit);
         }
     }
@@ -68,6 +87,8 @@ XPaymentsWidget.prototype.trigger = function(event, params)
     if ('function' === typeof this.handlers[event]) {
         this.handlers[event](params);
     }
+
+    this._log('X-Payments widget triggered: ' + event, params);
 
     return this;
 }
@@ -93,23 +114,16 @@ XPaymentsWidget.prototype.init = function(settings)
   }
 
   // Set default handlers
-  // other events: fail, loaded, unloaded, submitReady
-
   this.on('formSubmit', function (domEvent) {
       // "this" here is the widget
-      this.submit();
-      domEvent.preventDefault();
-  }).on('success', function(params) {
-      var formElm = this.getFormElm();
-      if (formElm) {
-          var input = document.createElement('input');
-          input.type = 'hidden';
-          input.name = 'xpaymentsToken';
-          input.value = params.token;
-          formElm.appendChild(input);
-          formElm.submit();
+      if (this.isValid()) {
+          this.submit();
+          domEvent.preventDefault();
       }
-  }).on('alert', function(params) {
+  })
+  .on('success', this._defaultSuccessHandler)
+  .on('applepay.paymentauthorized', this._applePayAuthorized)
+  .on('alert', function(params) {
       window.alert(params.message);
   });
 
@@ -124,6 +138,13 @@ XPaymentsWidget.prototype.init = function(settings)
   }
 
   return this;
+}
+
+XPaymentsWidget.prototype.initCheckoutWithApplePay = function(settings)
+{
+    this.config.container = 'body';
+    this.config.applePay.checkoutMode = true;
+    this.init(settings);
 }
 
 XPaymentsWidget.prototype.generateId = function()
@@ -180,6 +201,9 @@ XPaymentsWidget.prototype.load = function()
         elm.style.height = '0';
         elm.style.overflow = 'hidden';
         elm.style.border = 'none';
+        if (this.config.applePay.checkoutMode) {
+            elm.style.display = 'none';
+        }
         elm.setAttribute('scrolling', 'no');
         containerElm.appendChild(elm);
     }
@@ -193,6 +217,9 @@ XPaymentsWidget.prototype.load = function()
     }
     if (this.config.language) {
         url += '&language=' + encodeURIComponent(this.config.language);
+    }
+    if (this.config.applePay.checkoutMode) {
+        url += '&target=checkout_apple_pay';
     }
     elm.src = url;
 
@@ -211,7 +238,18 @@ XPaymentsWidget.prototype.getServerUrl = function()
 
 XPaymentsWidget.prototype.submit = function()
 {
-    this._sendEvent('submit');
+    if (!this.config.applePay.checkoutMode) {
+        this._sendEvent('submit');
+    } else {
+        this.beginCheckoutWithApplePay();
+    }
+}
+
+XPaymentsWidget.prototype.beginCheckoutWithApplePay = function()
+{
+    if (this._isApplePayAvailable()) {
+        this._sendEvent('applepay.begincheckout');
+    }
 }
 
 XPaymentsWidget.prototype._afterLoad = function(params)
@@ -226,9 +264,24 @@ XPaymentsWidget.prototype._afterLoad = function(params)
     this.resize(params.height);
 }
 
+XPaymentsWidget.prototype._defaultSuccessHandler = function(params) {
+    var formElm = this.getFormElm();
+    if (formElm) {
+        var input = document.getElementById(this.config.tokenName);
+        if (!input) {
+            input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = input.id = this.config.tokenName;
+            formElm.appendChild(input);
+        }
+        input.value = params.token;
+        formElm.submit();
+    }
+}
+
 XPaymentsWidget.prototype.getPaymentMethod = function()
 {
-    return this.paymentMethod;
+    return (!this.config.applePay.checkoutMode) ? this.paymentMethod : 'apple_pay';
 }
 
 XPaymentsWidget.prototype._paymentMethodChange = function(params)
@@ -238,17 +291,29 @@ XPaymentsWidget.prototype._paymentMethodChange = function(params)
 
 XPaymentsWidget.prototype._applePayValidated = function(params)
 {
-    this.applePaySession.completeMerchantValidation(params.data);
+    try {
+        this.applePaySession.completeMerchantValidation(params.data);
+    } catch (e) {
+    }
+}
+
+XPaymentsWidget.prototype._applePayAuthorized = function(params)
+{
+    this.succeedApplePayPayment(params);
 }
 
 XPaymentsWidget.prototype._applePayCompleted = function(params)
 {
-    this.applePaySession.completePayment({ status: ApplePaySession.STATUS_SUCCESS, errors: [] });
+    this.completeApplePayPayment({ status: ApplePaySession.STATUS_SUCCESS, errors: [] });
 }
 
 XPaymentsWidget.prototype._applePayError = function(params)
 {
-    this.applePaySession.abort();
+    try {
+        this.applePaySession.abort();
+    } catch (e) {
+        // Skip errors if any
+    }
 }
 
 XPaymentsWidget.prototype._applePayStart = function(params)
@@ -264,6 +329,19 @@ XPaymentsWidget.prototype._applePayStart = function(params)
         },
     };
 
+    this.applePayCustomerAddress = null;
+    if (this.config.applePay.checkoutMode) {
+        if (this.config.applePay.shippingMethods) {
+            request.shippingMethods = this.config.applePay.shippingMethods;
+        }
+        if (this.config.applePay.requiredShippingFields) {
+            request.requiredShippingContactFields = this.config.applePay.requiredShippingFields;
+        }
+        if (this.config.applePay.requiredBillingFields) {
+            request.requiredBillingContactFields = this.config.applePay.requiredBillingFields;
+        }
+    }
+
     this.applePaySession = new ApplePaySession(3, request);
 
     this.applePaySession.onvalidatemerchant = (function(event) {
@@ -275,19 +353,58 @@ XPaymentsWidget.prototype._applePayStart = function(params)
     }).bind(this);
 
     this.applePaySession.onpaymentauthorized = (function(event) {
-        this._sendEvent('applepay.paymentauthorized', { payment: event.payment });
+        this.trigger('applepay.paymentauthorized', event.payment);
     }).bind(this);
 
     this.applePaySession.oncancel = (function(event) {
         this._sendEvent('applepay.cancel');
     }).bind(this);
 
+    if (this.config.applePay.checkoutMode) {
+        this.applePaySession.onshippingcontactselected = (function(event) {
+            this.trigger('applepay.shippingcontactselected', event.shippingContact);
+        }).bind(this);
+        this.applePaySession.onshippingmethodselected = (function(event) {
+            this.trigger('applepay.shippingmethodselected', event.shippingMethod);
+        }).bind(this);
+    }
+
     this.applePaySession.begin();
 
 }
 
-XPaymentsWidget.prototype._isApplePayAvailable = function() {
+XPaymentsWidget.prototype._parseApplePayNewTotal = function(updateData)
+{
+    this.setOrder(updateData.newTotal.amount);
+    if ('undefined' != typeof updateData.newTotal && 'undefined' == typeof updateData.newTotal.label) {
+        updateData.newTotal.label = this.config.company.name;
+    }
+    return updateData;
+}
+
+XPaymentsWidget.prototype.completeApplePayShippingContactSelection = function(updateData) {
+    this.applePaySession.completeShippingContactSelection(this._parseApplePayNewTotal(updateData));
+}
+
+XPaymentsWidget.prototype.completeApplePayShippingMethodSelection = function(updateData) {
+    this.applePaySession.completeShippingMethodSelection(this._parseApplePayNewTotal(updateData));
+}
+
+XPaymentsWidget.prototype.completeApplePayPayment = function(updateData) {
+    this.applePaySession.completePayment(updateData);
+}
+
+XPaymentsWidget.prototype.succeedApplePayPayment = function(payment) {
+    this._sendEvent('applepay.paymentauthorized', { payment: payment });
+}
+
+
+XPaymentsWidget.prototype.isApplePaySupportedByDevice = function() {
     return (window.ApplePaySession && ApplePaySession.canMakePayments());
+}
+
+XPaymentsWidget.prototype._isApplePayAvailable = function() {
+    return this.config.applePay.enabled && this.isApplePaySupportedByDevice();
 }
 
 XPaymentsWidget.prototype._checkApplePayActiveCard = function(params)
@@ -295,6 +412,7 @@ XPaymentsWidget.prototype._checkApplePayActiveCard = function(params)
     var promise = ApplePaySession.canMakePaymentsWithActiveCard(params.merchantId);
     promise.then((function (canMakePayments) {
         if (canMakePayments) {
+            this.trigger('applepay.forceselect');
             this._sendEvent('applepay.select');
         }
     }).bind(this));
@@ -329,8 +447,11 @@ XPaymentsWidget.prototype.setOrder = function(total, currency)
 {
     if ('undefined' !== typeof total) {
         this.config.order.total = total;
+    }
+    if ('undefined' !== typeof currency) {
         this.config.order.currency = currency;
     }
+
     this._sendEvent('details', {
         tokenizeCard: this.config.order.tokenizeCard,
         total: this.config.order.total,
@@ -373,9 +494,10 @@ XPaymentsWidget.prototype.messageListener = function(event)
         if (
             msg &&
             msg.event &&
-            0 === msg.event.indexOf(this.messageNamespace)
+            0 === msg.event.indexOf(this.messageNamespace) &&
+            (!msg.widgetId || msg.widgetId === this.widgetId)
         ) {
-            this._log('X-Payments Event: ' + msg.event + "\n" + window.JSON.stringify(msg.params));
+            this._log('Received from X-Payments: ' + msg.event);
 
             var eventType = msg.event.substr(this.messageNamespace.length);
 
@@ -408,9 +530,17 @@ XPaymentsWidget.prototype.messageListener = function(event)
     }
 }
 
-XPaymentsWidget.prototype._log = function(msg)
+XPaymentsWidget.prototype._isDebugMode = function()
 {
-    if (this.config.debug) {
+    return this.config.debug;
+}
+
+XPaymentsWidget.prototype._log = function(msg, params)
+{
+    if (this._isDebugMode()) {
+        if ('undefined' !== typeof params) {
+            msg = msg + "\n" + JSON.stringify(params);
+        }
         console.log(msg);
     }
 }
@@ -436,7 +566,7 @@ XPaymentsWidget.prototype._postMessage = function(message)
         && elm
         && elm.contentWindow
     ) {
-        this._log('Sent to X-Payments: ' + message.event + "\n" + window.JSON.stringify(message.params));
+        this._log('Sent to X-Payments: ' + message.event, message.params);
         elm.contentWindow.postMessage(window.JSON.stringify(message), '*');
     } else {
         this._log('Error sending message - iframe wasn\'t initialized!');

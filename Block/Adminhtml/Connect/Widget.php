@@ -56,6 +56,13 @@ class Widget extends \Magento\Backend\Block\Template
     protected $backendUrl = null;
 
     /**
+     * PayPal Structure Plugin
+     *
+     * @var \Magento\Paypal\Model\Config\StructurePlugin
+     */
+    protected $paypalStructure;
+
+    /**
      * Constructor
      *
      * @param \Magento\Backend\Block\Template\Context $context
@@ -63,6 +70,7 @@ class Widget extends \Magento\Backend\Block\Template
      * @param \Magento\Framework\App\RequestInterface $request
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
      * @param \Magento\Backend\Model\UrlInterface $backendUrl
+     * @param \Magento\Paypal\Model\Config\StructurePlugin $paypalStructure
      * @param array $data
      *
      * @return void
@@ -73,6 +81,7 @@ class Widget extends \Magento\Backend\Block\Template
         \Magento\Framework\App\RequestInterface $request,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Magento\Backend\Model\UrlInterface $backendUrl,
+        \Magento\Paypal\Model\Config\StructurePlugin $paypalStructure,
         array $data = array()
     ) {
         $this->_template = 'connect/widget.phtml';
@@ -81,6 +90,7 @@ class Widget extends \Magento\Backend\Block\Template
         $this->request = $request;
         $this->storeManager = $storeManager;
         $this->backendUrl = $backendUrl;
+        $this->paypalStructure = $paypalStructure;
 
         parent::__construct($context, $data);
     }
@@ -96,7 +106,8 @@ class Widget extends \Magento\Backend\Block\Template
             $this->scopeConfig,
             $this->request,
             $this->storeManager,
-            $this->backendUrl
+            $this->backendUrl,
+            $this->paypalStructure
         );
     }
 }

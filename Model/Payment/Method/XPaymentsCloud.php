@@ -492,12 +492,16 @@ class XPaymentsCloud extends \Magento\Payment\Model\Method\AbstractMethod
      * @param \XPaymentsCloud\Response $response
      * @param \Magento\Payment\Model\InfoInterface $payment 
      *
-     * @return Cdev_XPaymentsCloud_Model_Payment_Cloud
+     * @return \Cdev\XPaymentsCloud\Model\Payment\Cloud
      */
     protected function processResponse(
         \XPaymentsCloud\Response $response,
         \Magento\Payment\Model\InfoInterface $payment
     ) {
+        if (!$response->isLastTransactionSuccessful()) {
+            throw new \Magento\Framework\Exception\LocalizedException(__($response->message));
+        }
+
         $info = $response->getPayment();
 
         // Compose transaction ID preventing duplicates

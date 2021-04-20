@@ -22,7 +22,6 @@ define(
     [
         'Magento_Checkout/js/view/payment/default',
         'Magento_Checkout/js/checkout-data',
-        'xpayments/base',
     ],
     function (Component, checkoutData) {
         'use strict';
@@ -77,7 +76,13 @@ define(
                  */
                 XPayments.prototype.isCurrent = function () {
                     return 'undefined' != typeof checkoutData
-                        && 'xpayments_cloud' == checkoutData.getSelectedPaymentMethod();
+                        && (
+                            'xpayments_cloud' == checkoutData.getSelectedPaymentMethod()
+                            || (
+                                jQuery('#xpayments_cloud').next('label').is(':visible')
+                                && jQuery('#xpayments_cloud').get(0).checked
+                            )
+                        );
                 }
 
                 /**
@@ -131,6 +136,26 @@ define(
             placeOrder: function ()
             {
                 window.xpayments.onSubmitPayment(this._super.bind(this));
+            },
+
+            /**
+             * Place order fail
+             *
+             * @return void
+             */
+            placeOrderFail: function ()
+            {
+                window.xpayments.onSwitchPaymentMethod();
+            },
+
+            /**
+             * Get place order deferred object
+             *
+             * @return {*}
+             */
+            getPlaceOrderDeferredObject: function()
+            {
+                return this._super().fail(this.placeOrderFail);
             },
         });
     }

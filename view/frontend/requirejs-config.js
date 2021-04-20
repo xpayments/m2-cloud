@@ -25,9 +25,8 @@ var config = {
         'xpayments/base': 'CDev_XPaymentsCloud/js/base',
     },
     shim: {
-        'xpayments/base': [
-            'prototype',
-            'xpayments/lib/widget',
-        ],
+        'xpayments/base': ['prototype', 'xpayments/lib/widget'],
+        'CDev_XPaymentsCloud/js/view/payment/xpayments-cloud': ['xpayments/base'],
     },
+    deps: ['xpayments/lib/widget']
 };

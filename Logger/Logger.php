@@ -142,7 +142,7 @@ class Logger extends \Monolog\Logger
 
         if ($trace) {
             $message .= '--------------------------' . PHP_EOL
-                . Magento\Framework\Debug::backtrace(true, false, false)
+                . \Magento\Framework\Debug::backtrace(true, false, false)
                 . PHP_EOL;
         }
 

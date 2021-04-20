@@ -19,9 +19,9 @@
  * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
-var XPaymentsLoader = Class.create();
+window.XPaymentsLoader = Class.create();
 
-XPaymentsLoader.prototype = {
+window.XPaymentsLoader.prototype = {
 
     /**
      * ID of the loader element
@@ -86,7 +86,7 @@ XPaymentsLoader.prototype = {
 /**
  * Initialize X-Payments widget
  */
-XPaymentsWidget.prototype.init = XPaymentsWidget.prototype.init.wrap(
+window.XPaymentsWidget.prototype.init = XPaymentsWidget.prototype.init.wrap(
     function(parentMethod, settings) {
 
          Object.extend(
@@ -105,7 +105,7 @@ XPaymentsWidget.prototype.init = XPaymentsWidget.prototype.init.wrap(
 /**
  * Redefine server URL (if necessary)
  */
-XPaymentsWidget.prototype.getServerUrl = XPaymentsWidget.prototype.getServerUrl.wrap(
+window.XPaymentsWidget.prototype.getServerUrl = XPaymentsWidget.prototype.getServerUrl.wrap(
     function (parentMethod) {
     
         var devUrl = this.config.devUrl;
@@ -127,9 +127,9 @@ XPaymentsWidget.prototype.getServerUrl = XPaymentsWidget.prototype.getServerUrl.
     }
 );
 
-var XPayments = Class.create();
+window.XPayments = Class.create();
 
-XPayments.prototype = {
+window.XPayments.prototype = {
 
     /**
      * Original submit payment form function
