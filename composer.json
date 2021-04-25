@@ -9,11 +9,11 @@
     ],
     "minimum-stability": "dev",
     "require": {
-        "php": "~7.1.3||~7.2.0||~7.3.0",
+        "php": "~7.1.3||~7.2.0||~7.3.0||~7.4.0",
         "magento/module-payment": "100.4.*",
         "magento/module-checkout": "100.4.*",
         "magento/module-sales": "103.0.*",
-        "xpayments/cloud-sdk-php": "~0.2.0"
+        "xpayments/cloud-sdk-php": "~0.2.*"
     },
     "autoload": {
         "files": [ "registration.php" ],
