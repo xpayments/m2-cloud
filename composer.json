@@ -13,7 +13,7 @@
         "magento/module-payment": "100.4.*",
         "magento/module-checkout": "100.4.*",
         "magento/module-sales": "103.0.*",
-        "xpayments/cloud-sdk-php": "~0.2.*"
+        "xpayments/cloud-sdk-php": "~0.2.0"
     },
     "autoload": {
         "files": [ "registration.php" ],
