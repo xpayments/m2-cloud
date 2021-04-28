@@ -100,7 +100,7 @@ class ConnectSettings extends DataObject
             'container'      => '#xpayments-iframe-container',
             'sectionId'      => $this->getSectionId(),
             'loaded'         => false,
-            'referrerUrl'    => $this->getReferrerUrl(),
+            'referrerUrl'    => $this->storeManager->getStore()->getBaseUrl(),
             'saveUrl'        => $this->getSaveUrl(),
             'configMap'      => $this->getConfigMap(),
             'debug'          => (bool)$scopeConfig->getValue('payment/xpayments_cloud/debug'),
@@ -160,23 +160,6 @@ class ConnectSettings extends DataObject
         }
 
         return $this->backendUrl->getUrl('xpayments_cloud/system_config/save', $params);
-    }
-
-    /**
-     * Get referrer URL for X-Payments Connect
-     *
-     * @return string
-     */
-    protected function getReferrerUrl()
-    {
-        // Remove session key from URL
-        $url = preg_replace(
-            array('/\/key\/\w+\//', '/\?.*$/'),
-            array('/platform/magento2', ''),
-            $this->storeManager->getStore()->getCurrentUrl()
-        );
-
-        return $url;
     }
 
     /**
