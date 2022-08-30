@@ -151,6 +151,11 @@ class Cart extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $description = 'Order #' . $order->getIncrementId();
 
+        $storeInfo = $this->scopeConfig->getValue('general/store_information/name');
+        if ($storeInfo) {
+            $description = $storeInfo;
+        }
+
         $billingAddress = $this->addressHelper->prepareBillingAddress($order);
 
         if ($order->getShippingAddress()) {
