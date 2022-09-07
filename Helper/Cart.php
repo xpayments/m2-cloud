@@ -22,6 +22,8 @@
 
 namespace CDev\XPaymentsCloud\Helper;
 
+use Magento\Store\Model\ScopeInterface;
+
 /**
  * Helper for cart
  */
@@ -151,7 +153,7 @@ class Cart extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $description = 'Order #' . $order->getIncrementId();
 
-        $storeInfo = $this->scopeConfig->getValue('general/store_information/name');
+        $storeInfo = $this->scopeConfig->getValue('general/store_information/name', ScopeInterface::SCOPE_STORE);
         if ($storeInfo) {
             $description = $storeInfo;
         }
