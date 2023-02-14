@@ -98,7 +98,7 @@ class Widget extends \Magento\Backend\Block\Template
     /**
      * Get hash of widget settings
      *
-     * @return \CDev\XPaymentsCloud\Transport\ConnectSettings 
+     * @return \CDev\XPaymentsCloud\Transport\ConnectSettings
      */
     public function getConnectWidgetSettings()
     {

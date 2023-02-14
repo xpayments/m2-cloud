@@ -27,7 +27,7 @@ namespace CDev\XPaymentsCloud\Logger;
  */
 class Logger extends \Monolog\Logger
 {
-    /** 
+    /**
      * Store manager
      *
      * @var \Magento\Store\Model\StoreManagerInterface

@@ -1,0 +1,7 @@
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="sales_order_payment">
+        <column xsi:type="varchar" name="cc_first_6" nullable="false" length="6" comment="Cc First 6"/>
+        <column xsi:type="varchar" name="xpayments_customer_id" nullable="false" length="32" comment="X-Payments Customer ID"/>
+    </table>
+</schema>

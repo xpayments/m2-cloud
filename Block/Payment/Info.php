@@ -30,12 +30,12 @@ class Info extends \Magento\Payment\Block\ConfigurableInfo
     /**
      * Name of the X-Payments card field
      */
-    const XPAYMENTS_CARD = 'xpayments_card';
+    protected const XPAYMENTS_CARD = 'xpayments_card';
 
     /**
      * Placeholder for hidden numbers in card number
      */
-    const PLACEHOLDER = '&#8226;';
+    protected const PLACEHOLDER = '&#8226;';
 
     /**
      * Returns label

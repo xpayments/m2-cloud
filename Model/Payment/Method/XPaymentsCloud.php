@@ -30,20 +30,26 @@ class XPaymentsCloud extends \Magento\Payment\Model\Method\AbstractMethod
     /**
      * Payment method code
      */
-    const CODE = 'xpayments_cloud';
+    public const CODE = 'xpayments_cloud';
 
     /**
      * Payment method code
+     *
+     * @var string
      */
     protected $_code = self::CODE;
 
     /**
      * Payment Info block
+     *
+     * @var string
      */
     protected $_infoBlockType = \CDev\XPaymentsCloud\Block\Payment\Info::class;
 
     /**
      * Payment method flags
+     *
+     * @var bool
      */
     protected $_isGateway               = false;
 
@@ -59,10 +65,10 @@ class XPaymentsCloud extends \Magento\Payment\Model\Method\AbstractMethod
 
     protected $_canVoid                 = true;
 
-    protected $_canReviewPayment        = true;    
+    protected $_canReviewPayment        = true;
 
     /**
-     * Customer repository 
+     * Customer repository
      *
      * @var \Magento\Customer\Api\CustomerRepositoryInterface
      */
@@ -89,8 +95,8 @@ class XPaymentsCloud extends \Magento\Payment\Model\Method\AbstractMethod
      */
     protected $cartHelper = null;
 
-    /** 
-     * SDK Client helper    
+    /**
+     * SDK Client helper
      *
      * @var \CDev\XPaymentsCloud\Helper\Client
      */
@@ -114,13 +120,14 @@ class XPaymentsCloud extends \Magento\Payment\Model\Method\AbstractMethod
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      * @param \Magento\Payment\Model\Method\Logger $logger
      * @param \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository
+     * @param \Magento\Framework\UrlInterface $urlBuilder
      * @param \CDev\XPaymentsCloud\Helper\Cart $cartHelper
      * @param \CDev\XPaymentsCloud\Helper\Client $clientHelper
      * @param \CDev\XPaymentsCloud\Logger\Logger $xpaymentsLogger
      * @param \Magento\Framework\Model\ResourceModel\AbstractResource $resource
      * @param \Magento\Framework\Data\Collection\AbstractDb $resourceCollection
      * @param array $data
-     * @param Magento\Directory\Helper\Data $directory
+     * @param \Magento\Directory\Helper\Data $directory
      *
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
@@ -216,7 +223,7 @@ class XPaymentsCloud extends \Magento\Payment\Model\Method\AbstractMethod
      *
      * @param \Magento\Payment\Model\InfoInterface $payment
      *
-     * @return string 
+     * @return string
      */
     protected function getXpaymentsCustomerId(\Magento\Payment\Model\InfoInterface $payment)
     {
@@ -241,7 +248,7 @@ class XPaymentsCloud extends \Magento\Payment\Model\Method\AbstractMethod
      * @param \Magento\Payment\Model\InfoInterface $payment
      * @param string $xpaymentsCustomerId
      *
-     * @return void 
+     * @return void
      */
     protected function setXpaymentsCustomerId(\Magento\Payment\Model\InfoInterface $payment, $xpaymentsCustomerId)
     {
@@ -490,7 +497,7 @@ class XPaymentsCloud extends \Magento\Payment\Model\Method\AbstractMethod
      * Process X-Payments Cloud payment response
      *
      * @param \XPaymentsCloud\Response $response
-     * @param \Magento\Payment\Model\InfoInterface $payment 
+     * @param \Magento\Payment\Model\InfoInterface $payment
      *
      * @return \Cdev\XPaymentsCloud\Model\Payment\Cloud
      */

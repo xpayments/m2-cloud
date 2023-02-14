@@ -19,66 +19,69 @@
  * @copyright  (c) 2010-present Qualiteam software Ltd <info@x-cart.com>. All rights reserved
  * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
+declare(strict_types=1);
 
-namespace CDev\XPaymentsCloud\Setup;
+namespace CDev\XPaymentsCloud\Setup\Patch\Data;
 
 /**
- * Install data
+ * Add EAV attribute for X-Payments Customer ID
  */
-class InstallData implements \Magento\Framework\Setup\InstallDataInterface 
+class AddXPaymentsCustomerIDAttribute implements \Magento\Framework\Setup\Patch\DataPatchInterface
 {
+    /**
+     * @var ModuleDataSetupInterface $moduleDataSetup
+     */
+    private $moduleDataSetup;
+
     /**
      * Customer setup factory
      *
      * @var \Magento\Customer\Setup\CustomerSetupFactory $customerSetupFactory
      */
     protected $customerSetupFactory = null;
-    
+
     /**
-     * Attribute setup factory
+     * Attribute set factory
      *
      * @var \Magento\Eav\Model\Entity\Attribute\SetFactory
      */
     private $attributeSetFactory = null;
-    
+
     /**
      * Constructor
      *
+     * @param \Magento\Framework\Setup\ModuleDataSetupInterface $moduleDataSetup
      * @param \Magento\Customer\Setup\CustomerSetupFactory $customerSetupFactory
      * @param \Magento\Eav\Model\Entity\Attribute\SetFactory $attributeSetFactory
      *
      * @return void
      */
     public function __construct(
+        \Magento\Framework\Setup\ModuleDataSetupInterface $moduleDataSetup,
         \Magento\Customer\Setup\CustomerSetupFactory $customerSetupFactory,
         \Magento\Eav\Model\Entity\Attribute\SetFactory $attributeSetFactory
     ) {
+        $this->moduleDataSetup = $moduleDataSetup;
+
         $this->customerSetupFactory = $customerSetupFactory;
         $this->attributeSetFactory = $attributeSetFactory;
     }
- 
-    
+
     /**
-     * Install
-     *
-     * @param \Magento\Framework\Setup\ModuleDataSetupInterface $setup
-     * @param \Magento\Framework\Setup\ModuleContextInterface
+     * Do Upgrade
      *
      * @return void
      */
-    public function install(
-        \Magento\Framework\Setup\ModuleDataSetupInterface $setup,
-        \Magento\Framework\Setup\ModuleContextInterface $context
-    ) {
+    public function apply()
+    {
+        $customerSetup = $this->customerSetupFactory->create(array('setup' => $this->moduleDataSetup));
 
-        $customerSetup = $this->customerSetupFactory->create(array('setup' => $setup));
-        
         $customerEntity = $customerSetup->getEavConfig()->getEntityType('customer');
         $attributeSetId = $customerEntity->getDefaultAttributeSetId();
-        
+
         $attributeSet = $this->attributeSetFactory->create();
         $attributeGroupId = $attributeSet->getDefaultGroupId($attributeSetId);
-        
+
         $customerSetup->addAttribute(
             \Magento\Customer\Model\Customer::ENTITY,
             'xpayments_customer_id',
@@ -94,10 +97,10 @@ class InstallData implements \Magento\Framework\Setup\InstallDataInterface
                 'system'       => 0,
             )
         );
-        
+
         $attribute = $customerSetup->getEavConfig()
             ->getAttribute(
-                \Magento\Customer\Model\Customer::ENTITY, 
+                \Magento\Customer\Model\Customer::ENTITY,
                 'xpayments_customer_id'
             )->addData(
                 array(
@@ -105,7 +108,23 @@ class InstallData implements \Magento\Framework\Setup\InstallDataInterface
                     'attribute_group_id' => $attributeGroupId,
                 )
             );
-        
+
         $attribute->save();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getAliases()
+    {
+        return array();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getDependencies()
+    {
+        return array();
     }
 }

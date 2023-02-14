@@ -25,8 +25,13 @@ namespace CDev\XPaymentsCloud\Helper;
 /**
  * Helper for cart
  */
-class Cart extends \Magento\Framework\App\Helper\AbstractHelper 
+class Cart extends \Magento\Framework\App\Helper\AbstractHelper
 {
+    /**
+     * Default string length
+     */
+    protected const DEFAULT_STRING_LENGTH = 255;
+
     /**
      * Store information
      *
@@ -91,6 +96,19 @@ class Cart extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
+     * Convert passed value to a string of limited length
+     *
+     * @param mixed $value
+     * @param int $length
+     *
+     * @return string
+     */
+    protected function prepareString($value, $length = self::DEFAULT_STRING_LENGTH)
+    {
+        return substr((string)$value, 0, $length);
+    }
+
+    /**
      * Check if quantity is positive integer
      *
      * @param int|float|string $quantity Quantity
@@ -106,35 +124,50 @@ class Cart extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Prepare items from quote for initial payment request
      *
+     * @param \Magento\Sales\Api\Data\OrderInterface $order
+     *
      * @return array
      */
-    protected function prepareItems($order)
+    protected function prepareItems(\Magento\Sales\Api\Data\OrderInterface $order)
     {
         $items = array();
 
         foreach ($order->getAllVisibleItems() as $item) {
 
+            if (\Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE == $item->getProductType()) {
+                continue;
+            }
+
+            $name = $item->getName();
+            $sku = $item->getSku();
+            $quantity = $item->getQtyOrdered();
+
+            if ($item->getParentItem()) {
+                $currentItem = $item->getParentItem();
+            } else {
+                $currentItem = $item;
+            }
+
             $quantity = $item->getQtyOrdered();
 
             if ($this->isNaturalNumber($quantity)) {
 
-                $items[] = array(
-                    'quantity' => (int)$quantity,
-                    'name'     => $item->getName(),
-                    'sku'      => $item->getSku(),
-                    'price'    => $this->preparePrice($item->getPrice()),
-                );
+                $price = $currentItem->getPrice();
+                $quantity = (int)$quantity;
 
             } else {
 
-                $items[] = array(
-                    'quantity' => 1,
-                    'name'     => sprintf('%s (x%s)', $item->getName(), round($quantity, 2)),
-                    'sku'      => $item->getSku(),
-                    'price'    => $this->preparePrice($item->getData('base_row_total')),
-                );
-
+                $name = sprintf('%s (x%s)', $name, round($quantity, 2));
+                $quantity = 1;
+                $price = $currentItem->getBaseRowTotal();
             }
+
+            $items[] = array(
+                'quantity' => $quantity,
+                'name'     => $this->prepareString($name),
+                'sku'      => $this->prepareString($sku),
+                'price'    => $this->preparePrice($price),
+            );
         }
 
         return $items;
@@ -143,7 +176,7 @@ class Cart extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Prepare cart for initial payment request
      *
-     * @param \Magento\Sales\Api\Data\OrderInterface $order 
+     * @param \Magento\Sales\Api\Data\OrderInterface $order
      *
      * @return array
      */

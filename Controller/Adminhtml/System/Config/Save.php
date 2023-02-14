@@ -23,12 +23,12 @@
 namespace CDev\XPaymentsCloud\Controller\Adminhtml\System\Config;
 
 /**
- * Save X-Payments Cloud connect settings 
+ * Save X-Payments Cloud connect settings
  */
-class Save extends \Magento\Config\Controller\Adminhtml\System\Config\Save 
+class Save extends \Magento\Config\Controller\Adminhtml\System\Config\Save
 {
     /**
-     * Resource config  
+     * Resource config
      *
      * @var \Magento\Config\Model\ResourceModel\Config
      */
@@ -57,6 +57,7 @@ class Save extends \Magento\Config\Controller\Adminhtml\System\Config\Save
      * @param \Magento\Config\Model\Config\Factory $configFactory
      * @param \Magento\Framework\Cache\FrontendInterface $cache
      * @param \Magento\Framework\Stdlib\StringUtils $string
+     * @param \Magento\Config\Model\ResourceModel\Config $resourceConfig
      */
     public function __construct(
         \Magento\Backend\App\Action\Context $context,
@@ -74,7 +75,7 @@ class Save extends \Magento\Config\Controller\Adminhtml\System\Config\Save
     /**
      * Save configuration
      *
-     * @return void 
+     * @return void
      */
     public function execute()
     {

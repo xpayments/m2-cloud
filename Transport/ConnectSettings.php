@@ -31,7 +31,7 @@ class ConnectSettings extends DataObject
      * Request
      *
      * @var \Magento\Framework\App\RequestInterface
-     */ 
+     */
     protected $request = null;
 
     /**
@@ -65,7 +65,7 @@ class ConnectSettings extends DataObject
     /**
      * Section ID
      *
-     * @param string
+     * @var string
      */
     protected $sectionId = null;
 
@@ -76,8 +76,9 @@ class ConnectSettings extends DataObject
      * @param \Magento\Framework\App\RequestInterface $request
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
      * @param \Magento\Backend\Model\UrlInterface $backendUrl
+     * @param \Magento\Paypal\Model\Config\StructurePlugin $paypalStructure
      *
-     * @return \Magento\Framework\DataObject 
+     * @return \Magento\Framework\DataObject
      */
     public function __construct(
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,

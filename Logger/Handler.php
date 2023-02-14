@@ -30,7 +30,7 @@ class Handler extends \Magento\Framework\Logger\Handler\Base
     /**
      * Log file name
      */
-    const XPAYMENTS_LOG_FILE = '/var/log/xpayments-cloud-%s.log';
+    protected const XPAYMENTS_LOG_FILE = '/var/log/xpayments-cloud-%s.log';
 
     /**
      * Constructor

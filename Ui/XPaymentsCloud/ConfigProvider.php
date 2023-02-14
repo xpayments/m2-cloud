@@ -22,13 +22,10 @@
 
 namespace CDev\XPaymentsCloud\Ui\XPaymentsCloud;
 
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-
 /**
  * Configuration provider for XPC method at checkout
  */
-class ConfigProvider implements \Magento\Checkout\Model\ConfigProviderInterface 
+class ConfigProvider implements \Magento\Checkout\Model\ConfigProviderInterface
 {
     /**
      * Payment method object
@@ -54,7 +51,7 @@ class ConfigProvider implements \Magento\Checkout\Model\ConfigProviderInterface
     /**
      * X-Payments cart helper
      *
-     * \CDev\XPaymentsCloud\Helper\Cart
+     * @var \CDev\XPaymentsCloud\Helper\Cart
      */
     protected $cartHelper = null;
 
@@ -76,7 +73,7 @@ class ConfigProvider implements \Magento\Checkout\Model\ConfigProviderInterface
      * Constructor
      *
      * @param \Magento\Payment\Helper\Data $paymentHelper
-     * @param \Magento\Framework\UrlInterface $urlBuilder
+     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
      * @param \CDev\XPaymentsCloud\Helper\Cart $cartHelper
      * @param \Magento\Customer\Model\Session $customerSession

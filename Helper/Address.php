@@ -25,23 +25,23 @@ namespace CDev\XPaymentsCloud\Helper;
 /**
  * Helper for address
  */
-class Address extends \Magento\Framework\App\Helper\AbstractHelper 
+class Address extends \Magento\Framework\App\Helper\AbstractHelper
 {
     /**
      * Placeholder for empty email (something which will pass X-Payments validation)
      */
-    const EMPTY_USER_EMAIL = 'user@example.com';
+    protected const EMPTY_USER_EMAIL = 'user@example.com';
 
     /**
      * Placeholder for not available cart data
      */
-    const NOT_AVAILABLE = 'N/A';
+    protected const NOT_AVAILABLE = 'N/A';
 
     /**
      * Billing and shipping address names
      */
-    const BILLING_ADDRESS = 'Billing';
-    const SHIPPING_ADDRESS = 'Shipping';
+    protected const BILLING_ADDRESS = 'Billing';
+    protected const SHIPPING_ADDRESS = 'Shipping';
 
     /**
      * Address Repository
@@ -124,12 +124,11 @@ class Address extends \Magento\Framework\App\Helper\AbstractHelper
         return $street;
     }
 
-
     /**
      * Prepare address hash
      *
      * @param \Magento\Sales\Api\Data\OrderInterface $order Order
-     * @param $type Address type, Billing or Shipping
+     * @param string $type Address type, Billing or Shipping
      *
      * @return array
      */

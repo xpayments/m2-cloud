@@ -23,9 +23,9 @@
 namespace CDev\XPaymentsCloud\Helper;
 
 /**
- * Helper for X-Payments SDK Client 
+ * Helper for X-Payments SDK Client
  */
-class Client extends \Magento\Framework\App\Helper\AbstractHelper 
+class Client extends \Magento\Framework\App\Helper\AbstractHelper
 {
     /**
      * X-Payments SDK Client

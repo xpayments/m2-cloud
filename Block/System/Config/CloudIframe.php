@@ -25,14 +25,14 @@ namespace CDev\XPaymentsCloud\Block\System\Config;
 /**
  * X-Payments Cloud configuration iframe
  */
-class CloudIframe extends \Magento\Config\Block\System\Config\Form\Field 
+class CloudIframe extends \Magento\Config\Block\System\Config\Form\Field
 {
     /**
      * Layout
      *
      * @var \Magento\Framework\View\LayoutInterface
      */
-     protected $layout;
+    protected $layout;
 
     /**
      * Constructor
@@ -43,14 +43,14 @@ class CloudIframe extends \Magento\Config\Block\System\Config\Form\Field
      *
      * @return void
      */
-     public function __construct(
+    public function __construct(
         \Magento\Backend\Block\Template\Context $context,
         \Magento\Framework\View\LayoutInterface $layout,
         array $data = array()
-     ) {
-         $this->layout = $layout;
-         parent::__construct($context);
-     }
+    ) {
+        $this->layout = $layout;
+        parent::__construct($context);
+    }
 
     /**
      * Retrieve HTML markup for given form element
@@ -62,7 +62,7 @@ class CloudIframe extends \Magento\Config\Block\System\Config\Form\Field
     public function render(\Magento\Framework\Data\Form\Element\AbstractElement $element)
     {
         $html = $this->layout
-            ->createBlock('CDev\XPaymentsCloud\Block\Adminhtml\Connect\Widget')
+            ->createBlock(\CDev\XPaymentsCloud\Block\Adminhtml\Connect\Widget::class)
             ->toHtml();
 
         return $this->_decorateRowHtml($element, $html);
